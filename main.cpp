@@ -6,7 +6,7 @@
 /*   By: anfouger <anfouger@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/24 21:37:59 by anfouger          #+#    #+#             */
-/*   Updated: 2026/08/24 22:02:43 by anfouger         ###   ########.fr       */
+/*   Updated: 2026/08/24 22:21:19 by anfouger         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,12 +41,18 @@ int main(void)
 	server_address.sin_port = htons(8080);
 	server_address.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
 
-	// Get the size of the struct for bind()
-	size_t serv_addr_size = sizeof(server_address);
 	// Conversion of sockaddr_in to sockaddr * for bind()
 	struct sockaddr *serv_addr = reinterpret_cast<struct sockaddr *>(&server_address);
 
-	int res_bind = bind(socket_fd, serv_addr, serv_addr_size);
+	int res_bind = bind(socket_fd, serv_addr, sizeof(server_address));
+	if (res_bind == -1)
+	{
+		std::cerr << "bind: " << std::strerror(errno) << std::endl;
+		close(socket_fd);
+		return (1);
+	}
+	std::cout << "Bind successful" << std::endl;
+
 	while (true)
 		;
 	return 0;
