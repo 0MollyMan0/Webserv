@@ -6,7 +6,7 @@
 /*   By: anfouger <anfouger@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/24 21:37:59 by anfouger          #+#    #+#             */
-/*   Updated: 2026/08/24 22:45:59 by anfouger         ###   ########.fr       */
+/*   Updated: 2026/08/24 23:34:36 by anfouger         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,8 +63,19 @@ int main(void)
 	}
 	std::cout << "Listen successful" << std::endl;
 	
-	close(socket_fd);
+	int	client_fd = accept(socket_fd, NULL, NULL);
+	if (client_fd == -1)
+	{
+		std::cerr << "accept: " << std::strerror(errno) << std::endl;
+		close(socket_fd);
+		return (1);
+	}
+	std::cout << "Client connected!" << std::endl;
+	
+	std::cout << "Server socket: " << socket_fd << std::endl;
+	std::cout << "Client socket: " << client_fd << std::endl;
 	while (true)
 		;
+	close(socket_fd);
 	return 0;
 }
