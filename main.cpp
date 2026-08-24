@@ -6,7 +6,7 @@
 /*   By: anfouger <anfouger@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/24 21:37:59 by anfouger          #+#    #+#             */
-/*   Updated: 2026/08/24 22:21:19 by anfouger         ###   ########.fr       */
+/*   Updated: 2026/08/24 22:45:59 by anfouger         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,7 @@ int main(void)
 		std::cerr << "socket: " << std::strerror(errno) << std::endl;
 		return (1);
 	}
+	std::cout << "Socket successful" << std::endl;
 
 	// Creation of the struct sockaddr_in, this struct is needed by the socket so they know where to connect
 	struct sockaddr_in server_address = {};
@@ -53,6 +54,16 @@ int main(void)
 	}
 	std::cout << "Bind successful" << std::endl;
 
+	int res_listen = listen(socket_fd, 10);
+	if (res_listen == -1)
+	{
+		std::cerr << "listen: " << std::strerror(errno) << std::endl;
+		close(socket_fd);
+		return (1);
+	}
+	std::cout << "Listen successful" << std::endl;
+	
+	close(socket_fd);
 	while (true)
 		;
 	return 0;
