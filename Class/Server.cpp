@@ -6,7 +6,7 @@
 /*   By: anfouger <anfouger@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/27 21:06:27 by anfouger          #+#    #+#             */
-/*   Updated: 2026/08/29 15:12:12 by anfouger         ###   ########.fr       */
+/*   Updated: 2026/08/29 15:16:29 by anfouger         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,8 +86,8 @@ bool	Server::run()
 
 	while (true)
 	{
-		int ret = poll(&server_poll, 1, 0);
-		
+		int ret = poll(&server_poll, 1, -1);
+
 		if (ret == -1)
 		{
 			std::cerr << "poll: " << std::strerror(errno) << std::endl;
