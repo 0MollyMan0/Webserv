@@ -6,7 +6,7 @@
 /*   By: anfouger <anfouger@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/29 15:50:12 by anfouger          #+#    #+#             */
-/*   Updated: 2026/08/29 18:17:22 by anfouger         ###   ########.fr       */
+/*   Updated: 2026/08/29 18:52:17 by anfouger         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,12 +19,16 @@ class Client
 {
 private:
 	int _fd;
+	std::string _buff;
 public:
+	Client();
 	Client(int fd);
 	~Client();
 
+	void	retrieveData(char	*buff, int len);
+
+	// === GETTER === //
 	int	getFd() const;
 };
-
 
 #endif

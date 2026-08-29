@@ -6,11 +6,15 @@
 /*   By: anfouger <anfouger@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/29 15:50:03 by anfouger          #+#    #+#             */
-/*   Updated: 2026/08/29 18:17:35 by anfouger         ###   ########.fr       */
+/*   Updated: 2026/08/29 18:50:10 by anfouger         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Client.hpp"
+
+Client::Client()
+{
+}
 
 Client::Client(int fd)
 {
@@ -24,4 +28,11 @@ Client::~Client()
 int	Client::getFd() const
 {
 	return (this->_fd);
+}
+
+void	Client::retrieveData(char	*buff, int len)
+{
+	this->_buff = buff;
+	std::cout.write(buff, len);
+	std::cout << "Client " << this->_fd << " Talk!" << std::endl;
 }

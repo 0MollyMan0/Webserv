@@ -6,7 +6,7 @@
 /*   By: anfouger <anfouger@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/27 21:06:27 by anfouger          #+#    #+#             */
-/*   Updated: 2026/08/29 18:25:53 by anfouger         ###   ########.fr       */
+/*   Updated: 2026/08/29 19:17:52 by anfouger         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -114,23 +114,25 @@ bool	Server::run()
 			{
 				if (this->_pollFds[i].revents & POLLIN)
 				{
-					char buff[100];
-					int	res = recv(this->_pollFds[i].fd, buff, 10, 0);
+					char	buff[100];
+					int		client_fd = this->_pollFds[i].fd;
+
+					int	res = recv(client_fd, buff, sizeof(buff), 0);
 					if (res == -1)
 					{
 						std::cerr << "recv: " << std::strerror(errno) << std::endl;
-						close(this->_pollFds[i].fd);
+						close(client_fd);
 						return (false);
 					}
 					else if (res == 0)
 					{
-						close(this->_pollFds[i].fd);
+						close(client_fd);
 						this->_pollFds.erase(this->_pollFds.begin() + i);
-						std::cout << "Client Disconnected" << std::endl;
+						this->_clients.erase(client_fd);
+						std::cout << "Client " << client_fd << " disconnected" << std::endl;
 						continue;
 					}
-					std::cout.write(buff, res);
-					std::cout << "Client Talk!" << std::endl;
+					this->_clients[client_fd].retrieveData(buff, res);
 				}
 			}
 		}
@@ -147,6 +149,7 @@ bool	Server::acceptNewClient()
 
 	struct pollfd newClient = {client_fd, POLLIN, 0};
 	this->_pollFds.push_back(newClient);
+	this->_clients.insert(std::make_pair(client_fd, Client(client_fd)));
 	std::cout << "Client connected!" << std::endl;
 
 	return (true);
