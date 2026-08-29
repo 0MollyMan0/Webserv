@@ -6,7 +6,7 @@
 /*   By: anfouger <anfouger@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/24 21:37:59 by anfouger          #+#    #+#             */
-/*   Updated: 2026/08/25 00:39:59 by anfouger         ###   ########.fr       */
+/*   Updated: 2026/08/28 22:47:34 by anfouger         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,63 +24,29 @@
 #include <cerrno>
 
 #include <unistd.h>
+#include <string.h>
+#include <Server.hpp>
+
+// std::map<std::string, std::string>	&createAddressPort(void)
+// {
+// 	std::map<std::string, std::string>  address_port;
+
+// 	address_port.insert(std::make_pair("127.0.0.1", "8080"));
+// 	address_port.insert(std::make_pair("192.168.0.1", "8080"));
+// 	address_port.insert(std::make_pair("192.168.0.2", "8080"));
+
+// 	return (address_port);
+// }
 
 int main(void)
 {
-	struct addrinfo hints = {};
-	struct addrinfo *res = NULL;
+    Server server;
 
-	hints.ai_family = AF_UNSPEC;
-	hints.ai_socktype = SOCK_STREAM; 
-	hints.ai_flags = AI_PASSIVE;
+    if (!server.setup())
+        return 1;
 
-	getaddrinfo(NULL, "8080", &hints, &res);
-
-	// Creation of socket	
-	int socket_fd = socket(AF_INET, SOCK_STREAM, 0);
-	// Verification of socket
-	if (socket_fd == -1)
-	{
-		std::cerr << "socket: " << std::strerror(errno) << std::endl;
-		freeaddrinfo(res);
-		return (1);
-	}
-	std::cout << "Socket successful" << std::endl;
-
-	int res_bind = bind(socket_fd, res->ai_addr, res->ai_addrlen);
-	if (res_bind == -1)
-	{
-		std::cerr << "bind: " << std::strerror(errno) << std::endl;
-		close(socket_fd);
-		freeaddrinfo(res);
-		return (1);
-	}
-	std::cout << "Bind successful" << std::endl;
-
-	int res_listen = listen(socket_fd, 10);
-	if (res_listen == -1)
-	{
-		std::cerr << "listen: " << std::strerror(errno) << std::endl;
-		close(socket_fd);
-		freeaddrinfo(res);
-		return (1);
-	}
-	std::cout << "Listen successful" << std::endl;
-	
-	int	client_fd = accept(socket_fd, NULL, NULL);
-	if (client_fd == -1)
-	{
-		std::cerr << "accept: " << std::strerror(errno) << std::endl;
-		close(socket_fd);
-		freeaddrinfo(res);
-		return (1);
-	}
-	std::cout << "Client connected!" << std::endl;
-	
-	std::cout << "Server socket: " << socket_fd << std::endl;
-	std::cout << "Client socket: " << client_fd << std::endl;
+    server.run();
 	while (true)
 		;
-	close(socket_fd);
 	return 0;
 }
