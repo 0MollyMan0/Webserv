@@ -6,7 +6,7 @@
 /*   By: anfouger <anfouger@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/29 15:50:12 by anfouger          #+#    #+#             */
-/*   Updated: 2026/08/29 15:51:48 by anfouger         ###   ########.fr       */
+/*   Updated: 2026/08/29 16:27:05 by anfouger         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 class Client
 {
 private:
-	int clientfd;
+	// int clientfd;
 public:
 	Client();
 	~Client();

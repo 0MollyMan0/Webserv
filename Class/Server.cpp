@@ -6,11 +6,11 @@
 /*   By: anfouger <anfouger@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/27 21:06:27 by anfouger          #+#    #+#             */
-/*   Updated: 2026/08/29 15:16:29 by anfouger         ###   ########.fr       */
+/*   Updated: 2026/08/29 16:29:31 by anfouger         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <Server.hpp>
+#include "Server.hpp"
 
 
 Server::Server()
@@ -71,6 +71,12 @@ bool	Server::setup()
 	}
 	std::cout << "Listen successful" << std::endl;
 
+	struct pollfd server_poll;
+	server_poll.fd = this->_socketFd;
+	server_poll.events = POLLIN;
+	server_poll.revents = 0;
+	this->_pollFds.push_back(server_poll);
+
 	freeaddrinfo(res);
 	return (true);
 }
@@ -78,35 +84,54 @@ bool	Server::setup()
 
 bool	Server::run()
 {
-	struct pollfd server_poll;
-
-	server_poll.fd = this->_socketFd;
-	server_poll.events = POLLIN;
-	server_poll.revents = 0;
-
 	while (true)
 	{
-		int ret = poll(&server_poll, 1, -1);
+		int ret = poll(&_pollFds[0], this->_pollFds.size(), -1);
 
 		if (ret == -1)
 		{
 			std::cerr << "poll: " << std::strerror(errno) << std::endl;
+			// Add a function to close all the fds
 			return (false);
 		}
 
-		if (server_poll.revents & POLLIN)
+		for (size_t i = 0; i < this->_pollFds.size(); i++)
 		{
-			int	client_fd = accept(this->_socketFd, NULL, NULL);
-			if (client_fd == -1)
+			// If server fd
+			if (this->_pollFds[i].fd == this->_socketFd)
 			{
-				std::cerr << "accept: " << std::strerror(errno) << std::endl;
-				close(this->_socketFd);
-				return (false);
+				if (this->_pollFds[i].revents & POLLIN)
+				{
+					int	client_fd = accept(this->_socketFd, NULL, NULL);
+					if (client_fd == -1)
+					{
+						std::cerr << "accept: " << std::strerror(errno) << std::endl;
+						close(this->_socketFd);
+						return (false);
+					}
+					struct pollfd newClient = {client_fd, POLLIN, 0};
+					this->_pollFds.push_back(newClient);
+					std::cout << "Client connected!" << std::endl;
+				}
 			}
-			std::cout << "Client connected!" << std::endl;
-
-			std::cout << "Server socket: " << this->_socketFd << std::endl;
-			std::cout << "Client socket: " << client_fd << std::endl;
+			// If client fd
+			else 
+			{
+				if (this->_pollFds[i].revents & POLLIN)
+				{
+					char *buff[100];
+					int	res = recv(this->_pollFds[i].fd, buff, 10, 0);
+					if (res == -1)
+					{
+						std::cerr << "recv: " << std::strerror(errno) << std::endl;
+						close(this->_socketFd);
+						return (false);
+					}
+					std::cout << buff << std::endl;
+					std::cout << "Client Talk!" << std::endl;
+				}
+			}
+			
 		}
 	}
 	return (true);
