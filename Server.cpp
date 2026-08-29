@@ -6,7 +6,7 @@
 /*   By: anfouger <anfouger@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/27 21:06:27 by anfouger          #+#    #+#             */
-/*   Updated: 2026/08/28 22:46:39 by anfouger         ###   ########.fr       */
+/*   Updated: 2026/08/29 15:12:12 by anfouger         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,18 +77,37 @@ bool	Server::setup()
 
 
 bool	Server::run()
-{	
-	int	client_fd = accept(this->_socketFd, NULL, NULL);
-	if (client_fd == -1)
-	{
-		std::cerr << "accept: " << std::strerror(errno) << std::endl;
-		close(this->_socketFd);
-		return (false);
-	}
-	std::cout << "Client connected!" << std::endl;
-	
-	std::cout << "Server socket: " << this->_socketFd << std::endl;
-	std::cout << "Client socket: " << client_fd << std::endl;
+{
+	struct pollfd server_poll;
 
+	server_poll.fd = this->_socketFd;
+	server_poll.events = POLLIN;
+	server_poll.revents = 0;
+
+	while (true)
+	{
+		int ret = poll(&server_poll, 1, 0);
+		
+		if (ret == -1)
+		{
+			std::cerr << "poll: " << std::strerror(errno) << std::endl;
+			return (false);
+		}
+
+		if (server_poll.revents & POLLIN)
+		{
+			int	client_fd = accept(this->_socketFd, NULL, NULL);
+			if (client_fd == -1)
+			{
+				std::cerr << "accept: " << std::strerror(errno) << std::endl;
+				close(this->_socketFd);
+				return (false);
+			}
+			std::cout << "Client connected!" << std::endl;
+
+			std::cout << "Server socket: " << this->_socketFd << std::endl;
+			std::cout << "Client socket: " << client_fd << std::endl;
+		}
+	}
 	return (true);
 }
