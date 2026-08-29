@@ -6,7 +6,7 @@
 /*   By: anfouger <anfouger@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/27 21:06:27 by anfouger          #+#    #+#             */
-/*   Updated: 2026/08/29 17:13:32 by anfouger         ###   ########.fr       */
+/*   Updated: 2026/08/29 18:25:53 by anfouger         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,16 +101,12 @@ bool	Server::run()
 			{
 				if (this->_pollFds[i].revents & POLLIN)
 				{
-					int	client_fd = accept(this->_socketFd, NULL, NULL);
-					if (client_fd == -1)
+					if (!acceptNewClient())
 					{
 						std::cerr << "accept: " << std::strerror(errno) << std::endl;
 						close(this->_socketFd);
 						return (false);
 					}
-					struct pollfd newClient = {client_fd, POLLIN, 0};
-					this->_pollFds.push_back(newClient);
-					std::cout << "Client connected!" << std::endl;
 				}
 			}
 			// If client fd
@@ -129,10 +125,7 @@ bool	Server::run()
 					else if (res == 0)
 					{
 						close(this->_pollFds[i].fd);
-						std::vector<pollfd>::iterator it = this->_pollFds.begin();
-						for (size_t x = 0; x < i; x++)
-							++it;
-						this->_pollFds.erase(it);
+						this->_pollFds.erase(this->_pollFds.begin() + i);
 						std::cout << "Client Disconnected" << std::endl;
 						continue;
 					}
@@ -142,5 +135,19 @@ bool	Server::run()
 			}
 		}
 	}
+	return (true);
+}
+
+bool	Server::acceptNewClient()
+{
+	int	client_fd = accept(this->_socketFd, NULL, NULL);
+
+	if (client_fd == -1)
+		return (false);
+
+	struct pollfd newClient = {client_fd, POLLIN, 0};
+	this->_pollFds.push_back(newClient);
+	std::cout << "Client connected!" << std::endl;
+
 	return (true);
 }
