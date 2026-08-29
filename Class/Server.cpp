@@ -6,7 +6,7 @@
 /*   By: anfouger <anfouger@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/27 21:06:27 by anfouger          #+#    #+#             */
-/*   Updated: 2026/08/29 16:29:31 by anfouger         ###   ########.fr       */
+/*   Updated: 2026/08/29 17:13:32 by anfouger         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,7 +81,6 @@ bool	Server::setup()
 	return (true);
 }
 
-
 bool	Server::run()
 {
 	while (true)
@@ -119,19 +118,28 @@ bool	Server::run()
 			{
 				if (this->_pollFds[i].revents & POLLIN)
 				{
-					char *buff[100];
+					char buff[100];
 					int	res = recv(this->_pollFds[i].fd, buff, 10, 0);
 					if (res == -1)
 					{
 						std::cerr << "recv: " << std::strerror(errno) << std::endl;
-						close(this->_socketFd);
+						close(this->_pollFds[i].fd);
 						return (false);
 					}
-					std::cout << buff << std::endl;
+					else if (res == 0)
+					{
+						close(this->_pollFds[i].fd);
+						std::vector<pollfd>::iterator it = this->_pollFds.begin();
+						for (size_t x = 0; x < i; x++)
+							++it;
+						this->_pollFds.erase(it);
+						std::cout << "Client Disconnected" << std::endl;
+						continue;
+					}
+					std::cout.write(buff, res);
 					std::cout << "Client Talk!" << std::endl;
 				}
 			}
-			
 		}
 	}
 	return (true);
