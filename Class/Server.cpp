@@ -6,7 +6,7 @@
 /*   By: anfouger <anfouger@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/27 21:06:27 by anfouger          #+#    #+#             */
-/*   Updated: 2026/08/31 18:00:22 by anfouger         ###   ########.fr       */
+/*   Updated: 2026/08/31 18:24:16 by anfouger         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -151,12 +151,14 @@ bool	Server::watchClientsSocket(int index)
 		int		client_fd = this->_pollFds[index].fd;
 
 		int	res = recv(client_fd, buff, sizeof(buff), 0);
+		// Error
 		if (res == -1)
 		{
 			std::cerr << "recv: " << std::strerror(errno) << std::endl;
 			close(client_fd);
 			return (false);
 		}
+		// Disconnect
 		else if (res == 0)
 		{
 			close(client_fd);
@@ -165,6 +167,7 @@ bool	Server::watchClientsSocket(int index)
 			std::cout << "Client " << client_fd << " disconnected" << std::endl;
 			return (true);
 		}
+		// No problem
 		this->_clients[client_fd].retrieveData(buff, res);
 	}
 	return (true);

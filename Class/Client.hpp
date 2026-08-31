@@ -6,7 +6,7 @@
 /*   By: anfouger <anfouger@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/29 15:50:12 by anfouger          #+#    #+#             */
-/*   Updated: 2026/08/29 18:52:17 by anfouger         ###   ########.fr       */
+/*   Updated: 2026/08/31 18:22:58 by anfouger         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,8 @@ class Client
 {
 private:
 	int _fd;
-	std::string _buff;
+	std::string _recvBuffer;
+	std::string _sendBuffer;
 public:
 	Client();
 	Client(int fd);
